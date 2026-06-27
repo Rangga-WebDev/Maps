@@ -1,3 +1,5 @@
+/** @format */
+
 // ============================================================
 //  MapView.tsx — Peta deklaratif dengan react-leaflet
 // ============================================================
@@ -7,7 +9,7 @@
 //  perbedaan besar gaya React dibanding manipulasi DOM langsung.
 // ============================================================
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -15,12 +17,12 @@ import {
   Popup,
   ZoomControl,
   useMap,
-} from 'react-leaflet';
-import L from 'leaflet';
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-import type { User } from '../../shared/types';
+} from "react-leaflet";
+import L from "leaflet";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import type { User } from "../../shared/types";
 
 // Perbaiki ikon marker default Leaflet yang "rusak" saat dibundel Vite.
 // (Tanpa ini, marker tampil sebagai gambar kosong.)
@@ -65,7 +67,7 @@ export default function MapView({ name, me, users }: Props) {
       center={[-5.135, 119.423]} // default: Makassar
       zoom={13}
       zoomControl={false}
-      style={{ position: 'absolute', inset: 0 }}
+      style={{ position: "absolute", inset: 0 }}
     >
       <TileLayer
         attribution="© OpenStreetMap"

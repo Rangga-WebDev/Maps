@@ -1,3 +1,5 @@
+/** @format */
+
 // ============================================================
 //  useRealtimeLocation.ts — "otak" realtime di sisi React
 // ============================================================
@@ -8,13 +10,13 @@
 //  komponen saat state berubah — itulah inti cara React bekerja.
 // ============================================================
 
-import { useEffect, useRef, useState } from 'react';
-import { io, type Socket } from 'socket.io-client';
+import { useEffect, useRef, useState } from "react";
+import { io, type Socket } from "socket.io-client";
 import type {
   ClientToServerEvents,
   ServerToClientEvents,
   User,
-} from '../../shared/types';
+} from "../../shared/types";
 
 // Socket bertipe: emit & on ikut diperiksa TypeScript.
 type AppSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
@@ -30,7 +32,7 @@ interface RealtimeState {
   me: Coords | null;
 }
 
-export function useRealtimeLocation(name: string): RealtimeState {
+export function useRealtimeLocation(token: string): RealtimeState {
   const [connected, setConnected] = useState(false);
   const [users, setUsers] = useState<Record<string, User>>({});
   const [me, setMe] = useState<Coords | null>(null);
@@ -38,36 +40,37 @@ export function useRealtimeLocation(name: string): RealtimeState {
 
   // Efek 1: buka koneksi socket sekali, dengarkan event server.
   useEffect(() => {
-    const socket: AppSocket = io(); // ke server (lewat proxy Vite saat dev)
+    // Token dikirim di handshake; server menolak koneksi tanpa token valid.
+    const socket: AppSocket = io({ auth: { token } });
     socketRef.current = socket;
 
-    socket.on('connect', () => setConnected(true));
-    socket.on('disconnect', () => setConnected(false));
+    socket.on("connect", () => setConnected(true));
+    socket.on("disconnect", () => setConnected(false));
 
-    socket.on('existing-users', (existing) => setUsers(existing));
+    socket.on("existing-users", (existing) => setUsers(existing));
 
-    socket.on('location-updated', (user) =>
-      setUsers((prev) => ({ ...prev, [user.id]: user }))
+    socket.on("location-updated", (user) =>
+      setUsers((prev) => ({ ...prev, [user.id]: user })),
     );
 
-    socket.on('user-left', (id) =>
+    socket.on("user-left", (id) =>
       setUsers((prev) => {
         const next = { ...prev };
         delete next[id];
         return next;
-      })
+      }),
     );
 
     // Cleanup: tutup koneksi saat komponen dilepas.
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [token]);
 
   // Efek 2: pantau lokasi sendiri & kirim ke server tiap kali bergerak.
   useEffect(() => {
-    if (!('geolocation' in navigator)) {
-      alert('Browser kamu tidak mendukung geolocation.');
+    if (!("geolocation" in navigator)) {
+      alert("Browser kamu tidak mendukung geolocation.");
       return;
     }
 
@@ -78,14 +81,14 @@ export function useRealtimeLocation(name: string): RealtimeState {
           lng: pos.coords.longitude,
         };
         setMe(coords);
-        socketRef.current?.emit('update-location', { ...coords, name });
+        socketRef.current?.emit("update-location", coords);
       },
-      (err) => alert('Gagal mengambil lokasi: ' + err.message),
-      { enableHighAccuracy: true, maximumAge: 0 }
+      (err) => alert("Gagal mengambil lokasi: " + err.message),
+      { enableHighAccuracy: true, maximumAge: 0 },
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [name]);
+  }, []);
 
   return { connected, users, me };
 }
