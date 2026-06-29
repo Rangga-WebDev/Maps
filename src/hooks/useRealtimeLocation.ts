@@ -32,7 +32,7 @@ interface RealtimeState {
   me: Coords | null;
 }
 
-export function useRealtimeLocation(token: string): RealtimeState {
+export function useRealtimeLocation(name: string): RealtimeState {
   const [connected, setConnected] = useState(false);
   const [users, setUsers] = useState<Record<string, User>>({});
   const [me, setMe] = useState<Coords | null>(null);
@@ -40,8 +40,7 @@ export function useRealtimeLocation(token: string): RealtimeState {
 
   // Efek 1: buka koneksi socket sekali, dengarkan event server.
   useEffect(() => {
-    // Token dikirim di handshake; server menolak koneksi tanpa token valid.
-    const socket: AppSocket = io({ auth: { token } });
+    const socket: AppSocket = io();
     socketRef.current = socket;
 
     socket.on("connect", () => setConnected(true));
@@ -64,8 +63,9 @@ export function useRealtimeLocation(token: string): RealtimeState {
     // Cleanup: tutup koneksi saat komponen dilepas.
     return () => {
       socket.disconnect();
+      socketRef.current = null;
     };
-  }, [token]);
+  }, []);
 
   // Efek 2: pantau lokasi sendiri & kirim ke server tiap kali bergerak.
   useEffect(() => {
@@ -81,14 +81,14 @@ export function useRealtimeLocation(token: string): RealtimeState {
           lng: pos.coords.longitude,
         };
         setMe(coords);
-        socketRef.current?.emit("update-location", coords);
+        socketRef.current?.emit("update-location", { ...coords, name });
       },
       (err) => alert("Gagal mengambil lokasi: " + err.message),
       { enableHighAccuracy: true, maximumAge: 0 },
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
-  }, []);
+  }, [name]);
 
   return { connected, users, me };
 }

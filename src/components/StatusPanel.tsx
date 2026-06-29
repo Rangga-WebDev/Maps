@@ -3,8 +3,6 @@
 // Panel status mengambang. Komponen "presentational" murni:
 // hanya menerima props lalu menampilkannya.
 
-import type { Role } from "../../shared/types";
-
 interface Coords {
   lat: number;
   lng: number;
@@ -13,19 +11,17 @@ interface Coords {
 interface Props {
   connected: boolean;
   name: string;
-  role: Role;
   onlineCount: number;
   coords: Coords | null;
-  onLogout: () => void;
+  onResetName: () => void;
 }
 
 export default function StatusPanel({
   connected,
   name,
-  role,
   onlineCount,
   coords,
-  onLogout,
+  onResetName,
 }: Props) {
   return (
     <aside id="panel">
@@ -44,10 +40,6 @@ export default function StatusPanel({
           <dd>{name}</dd>
         </div>
         <div className="row">
-          <dt>Peran</dt>
-          <dd>{role === "admin" ? "Admin" : "Anggota"}</dd>
-        </div>
-        <div className="row">
           <dt>Online</dt>
           <dd>{onlineCount}</dd>
         </div>
@@ -61,8 +53,8 @@ export default function StatusPanel({
         </div>
       </dl>
 
-      <button className="panel-logout" onClick={onLogout} type="button">
-        Keluar
+      <button className="panel-logout" onClick={onResetName} type="button">
+        Ganti nama
       </button>
     </aside>
   );

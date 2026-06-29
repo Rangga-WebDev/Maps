@@ -1,4 +1,6 @@
-# Live Map — Share Lokasi Realtime (React + TypeScript)
+<!-- @format -->
+
+# Live Map - Share Lokasi Realtime Dasar (React + TypeScript)
 
 Frontend **React (.tsx) + Vite**, backend **Express + Socket.io** dijalankan
 oleh **tsx**, peta dengan **react-leaflet**.
@@ -44,6 +46,8 @@ Lalu buka **http://localhost:3000**.
 
 - **Geolocation hanya jalan di `localhost` atau HTTPS.**
 - Posisi disimpan di memori server (hilang saat restart).
+- Tidak memakai file `.env`, MongoDB, login, atau register. Identitas user hanya
+  berupa nama yang disimpan di `localStorage` browser.
 - Di dev, `<React.StrictMode>` membuat efek dijalankan dua kali untuk mendeteksi
   bug. Karena kita sudah menulis cleanup (disconnect socket, clearWatch GPS),
   ini aman — kamu mungkin melihat log connect/disconnect ganda saat dev, itu wajar.
